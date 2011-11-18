@@ -19,7 +19,7 @@ public class RandomPlayer implements Player
 			for ( int j = -1; j <= 1; j ++ )
 			{
 				aintLocalViewL[ 1 + j ][ 1 + i ] = aintViewL[ intMid + j ][ intMid + i ];
-				if ( aintLocalViewL[ 1 + j ][ 1 + i ] == -1 )
+				if ( aintLocalViewL[ 1 + j ][ 1 + i ] == 2 )
 				{
 					if ( i == 0 && j == 0 )
 						continue;
@@ -29,13 +29,14 @@ public class RandomPlayer implements Player
 			}
 		}
 		
+		intMid = aintViewR.length / 2;
 		int[][] aintLocalViewR = new int[ 3 ][ 3 ];
 		for ( int i = -1; i <= 1; i ++ )
 		{
 			for ( int j = -1; j <= 1; j ++ )
 			{
 				aintLocalViewR[ 1 + j ][ 1 + i ] = aintViewR[ intMid + j ][ intMid + i ];
-				if ( aintViewR[ intMid + j ][ intMid + i ] == -1 )
+				if ( aintViewR[ intMid + j ][ intMid + i ] == 2 )
 				{
 					if ( i == 0 && j == 0 )
 						continue;

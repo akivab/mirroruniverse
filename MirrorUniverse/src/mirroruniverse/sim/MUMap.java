@@ -178,6 +178,7 @@ public class MUMap
 				{
 					intExitX = i;
 					intExitY = j;
+					aintMap[ j ][ i ] = intMapGrid;
 				}
 				if ( intMapGrid == 3 )
 				{

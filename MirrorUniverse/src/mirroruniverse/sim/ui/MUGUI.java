@@ -150,23 +150,24 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 				// JOptionPane.ERROR_MESSAGE);
 				// loading = false;
 				// }
-			}
-			// disable the begin button and the configPanel (freeze the config)
-			if ( !controlPanel.manual.isSelected() )
-			{
-				controlPanel.load.setEnabled(false);
-				fast = false;
-				if (true) {
-					controlPanel.stop.setEnabled(true);
-					controlPanel.play.setEnabled(true);
-					controlPanel.pause.setEnabled(false);
-					controlPanel.step.setEnabled(true);
-				} else {
-					// game set up failed. Turn the right buttons on/off.
-					controlPanel.load.setEnabled(true);
-					controlPanel.tournament.setEnabled(true);
+				if ( !controlPanel.manual.isSelected() )
+				{
+					controlPanel.load.setEnabled(false);
+					fast = false;
+					if (true) {
+						controlPanel.stop.setEnabled(true);
+						controlPanel.play.setEnabled(true);
+						controlPanel.pause.setEnabled(false);
+						controlPanel.step.setEnabled(true);
+					} else {
+						// game set up failed. Turn the right buttons on/off.
+						controlPanel.load.setEnabled(true);
+						controlPanel.tournament.setEnabled(true);
+					}
 				}
 			}
+			// disable the begin button and the configPanel (freeze the config)
+			
 			this.repaint();
 		} else if (command.compareToIgnoreCase("Step") == 0) {
 			nextStep();
