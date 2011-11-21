@@ -92,9 +92,6 @@ public class MirrorUniverse
 		}
 		
 		int intStep = 0;
-		plrCurrent.setStarting(
-				new int[]{mumMapL.getXLength(), mumMapL.getYLength()}, 
-				new int[]{mumMapL.getXLength(), mumMapR.getYLength()});
 		while ( !mumMapL.getMapOver() || !mumMapR.getMapOver() )
 		{
 			int[][] aintViewL = mumMapL.getView();

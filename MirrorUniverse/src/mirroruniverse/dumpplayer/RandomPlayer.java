@@ -70,10 +70,4 @@ public class RandomPlayer implements Player
 		}
 		return intD;
 	}
-
-	@Override
-	public void setStarting(int[] sl, int[] sr) {
-		// TODO Auto-generated method stub
-		
-	}
 }
