@@ -14,8 +14,8 @@ public class MUMap
 	private int intYLength;
 	private double dblThresh;
 	Random rdmGen;
-	private int intPositionX = -1;
-	private int intPositionY = -1;
+	public int intPositionX = -1;
+	public int intPositionY = -1;
 	private int intSightRadius;
 	private int intRound = 0;
 	private int intExitX = -1;
@@ -90,7 +90,7 @@ public class MUMap
 //		}		
 //	}
 	
-	protected MUMap( MUMapConfig mmcConfig )
+	public MUMap( MUMapConfig mmcConfig )
 	{
 		int intXLength = mmcConfig.getIntXLength();
 		int intYLength = mmcConfig.getIntYLength();
@@ -275,7 +275,7 @@ public class MUMap
 		return intStep;
 	}
 	
-	private boolean checkExit()
+	public boolean checkExit()
 	{
 		if ( intPositionX == intExitX && intPositionY == intExitY )
 		{
@@ -284,7 +284,7 @@ public class MUMap
 		return false;
 	}
 	
-	protected void move( int intDirection )
+	public void move( int intDirection )
 	{
 		int[] aintMove = aintDToM[ intDirection ];
 		int intDeltaX = aintMove[ 0 ];
@@ -292,7 +292,7 @@ public class MUMap
 		move( intDeltaX, intDeltaY );
 	}
 	
-	protected int[] getLocation()
+	public int[] getLocation()
 	{
 		int[] aintLocation = new int[ 2 ];
 		aintLocation[ 0 ] = intPositionX;
