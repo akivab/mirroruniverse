@@ -1,122 +1,126 @@
 package mirroruniverse.G5Player;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import mirroruniverse.sim.Player;
 
 public class G5Player implements Player {
-
-	boolean DEBUG = true;
-
-	// 2d arrays to hold maps for both players
-	int[][] map1;
-	int[][] map2;
-
-	// size of map
-	int size = 20;
-
+	public static boolean ON = false;
+	Map leftMap, rightMap;
 	State end;
+	ArrayList<Integer> moves;
+	ArrayList<String> seen;
 
-	// positions of the two players
-	int[] pos1 = new int[2];
-	int[] pos2 = new int[2];
-
-	// boolean matrix for whether goals have been reached
-	boolean[] reachedGoal = new boolean[2];
-
-	boolean mapModified = false;
-
-	public void setup() {
-		map1 = new int[size][size];
-		map2 = new int[size][size];
-		for (int i = 0; i < map1.length; i++)
-			for (int j = 0; j < map1[0].length; j++)
-				map2[i][j] = map1[i][j] = Util.UNSEEN;
-		pos2[0] = pos1[0] = map1.length / 2;
-		pos2[1] = pos1[1] = map1[0].length / 2;
+	public void updateMaps(int[][] lMap, int[][] rMap) {
+		if (leftMap == null && rightMap == null) {
+			DEBUG.println("Updating maps from NULL", DEBUG.LOW);
+			leftMap = new Map(lMap);
+			rightMap = new Map(rMap);
+			seen = new ArrayList<String>();
+		} else {
+			DEBUG.println("Augmenting maps", DEBUG.LOW);
+			leftMap.augment(lMap);
+			rightMap.augment(rMap);
+		}
 	}
 
-	public void augmentMap(int[][] map, int[][] view, int[] pos) {
-		int mid = view.length / 2;
-		int changes = 0;
-		for (int i = 0; i < view.length; i++)
-			for (int j = 0; j < view.length; j++) {
-				int x = i - mid + pos[0];
-				int y = j - mid + pos[1];
-				if (x >= 0 && y >= 0 && x < map.length && y < map[0].length
-						&& map[x][y] != Util.WALKED) {
-					if (map[x][y] != view[i][j]) {
-						map[x][y] = view[i][j];
-						changes++;
-					}
-				}
-			}
-		mapModified = (changes != 0);
+	public void pause() {
+		Scanner in = new Scanner(System.in);
+		in.nextLine();
 	}
-
-	public int valueAt(int[][] map, int[] pos) {
-		if (pos[0] < 0 || pos[0] >= map.length || pos[1] < 0
-				|| pos[1] >= map[0].length)
-			return 1;
-		return map[pos[0]][pos[1]];
-	}
-
-	public void update(int[] m) {
-		pos1 = Util.nextPos(map1, pos1, m);
-		pos2 = Util.nextPos(map2, pos2, m);
-	}
-
-	public int lookAndMove(int[][] aintViewL, int[][] aintViewR) {
-		if (map1 == null)
-			setup();
-
-		//Util.waitForSpace();
-
-		//Util.print(map1, pos1, null);
-		//Util.print(map2, pos2, null);
-
-		map1[pos1[0]][pos1[1]] = Util.WALKED;
-		map2[pos2[0]][pos2[1]] = Util.WALKED;
-
-		augmentMap(map1, aintViewL, pos1);
-		augmentMap(map2, aintViewR, pos2);
-		if (mapModified) {
-			Search s = new Search(map1, map2, pos1, pos2);
+	
+	/**
+	 * Returns a direction to move in (0 if nothing to return)
+	 */
+	public int getMove(){
+		if(end == null || end.isNotWorthGoingTo() || moves.isEmpty()){
+			Search s = new Search(leftMap, rightMap);
 			end = s.getEndState();
-			System.out.println(end);
+			if(end != null)
+				moves = end.getDirections();
 		}
+		DEBUG.println(end);
+		DEBUG.println(moves);
+		if(moves!=null && !moves.isEmpty())
+			return moves.remove(0);
+		DEBUG.println(leftMap.toString());
+		DEBUG.println(rightMap.toString());
+		pause();
+		return 0;
+	}
 
-		State k = end, l = null;
-		while (k != null && k.parent != null) {
-			l = k;
-			k = k.parent;
-		}
-		if (l != null) {
-			update(Util.D2M[l.move]);
-			l.parent = null;
-			return l.move;
-		}
-
-		System.out.println("Didn't move by search");
-
-		int[] m = null;
-		int moveValue = 12;
-		int i = 0, j = 0;
-		for (i = -1; i <= 1; i++)
-			for (j = -1; j <= 1; j++) {
-				int val = Util.moveVal(map1, map2, pos1, pos2,
-						new int[] { i, j });
-				System.out.println(val + Arrays.toString(new int[] { i, j }));
-				if (val < moveValue) {
-					m = new int[] { i, j };
-					moveValue = val;
+	/**
+	 * Implementation of look and move
+	 */
+	public int lookAndMove(int[][] aintViewL, int[][] aintViewR){
+		updateMaps(aintViewL, aintViewR);
+		int move = getMove();
+		leftMap.setNext(move);
+		rightMap.setNext(move);
+		return move;
+	}
+	
+	/**
+	 * Old method (not in use any more -- check out lookAndMove)
+	 * @param aintViewL left view
+	 * @param aintViewR right view
+	 * @return directions to move in
+	 */
+	public int oldLookAndMove(int[][] aintViewL, int[][] aintViewR) {
+		DEBUG.println("Looking and moving", DEBUG.LOW);
+		updateMaps(aintViewL, aintViewR);
+		DEBUG.println("Done updating maps", DEBUG.LOW);
+		// pause();
+		int[] p1 = leftMap.getPosition();
+		int[] p2 = rightMap.getPosition();
+		DEBUG.println(leftMap, DEBUG.MEDIUM);
+		DEBUG.println(rightMap, DEBUG.MEDIUM);
+		if(!seen.contains(State.encode(p1,p2)))
+				seen.add(State.encode(p1, p2));
+		boolean[] lDir = leftMap.validDirections();
+		boolean[] rDir = rightMap.validDirections();
+		
+		ArrayList<Integer> directions = new ArrayList<Integer>();
+		
+		for (int i = 1; i < 9; i++)
+			if (lDir[i] || rDir[i]) {
+				int[] np1 = leftMap.nextPos(i);
+				int[] np2 = rightMap.nextPos(i);
+				directions.add(i);
+				if (!seen.contains(State.encode(np1, np2))) {
+					leftMap.setNext(i);
+					rightMap.setNext(i);
+					return i;
 				}
+
 			}
-		System.out.println(Arrays.toString(m));
-		if (m == null)
-			return 0;
-		int d = Util.M2D[m[0] + 1][m[1] + 1];
-		update(m);
-		return d;
+			
+		int[] dir = leftMap.getDirections();
+		int j = 0;
+		for(int i : directions)
+			if(i != dir[j++])
+				System.out.println("NOT EQUAL");
+		int index = directions.get((int) (Math.random() * directions.size()));
+		leftMap.setNext(index);
+		rightMap.setNext(index);
+		
+		pause();
+		return index;
+	}
+}
+
+class DEBUG {
+	public static int LOW = 1, MEDIUM = 2, HIGH = 3;
+	public static int THRESHOLD = LOW;
+
+	public static void println(Object obj) {
+		if (G5Player.ON)
+			System.out.println(obj);
+	}
+
+	public static void println(Object obj, int level) {
+		if (G5Player.ON && level >= THRESHOLD)
+			System.out.println(obj);
 	}
 }
