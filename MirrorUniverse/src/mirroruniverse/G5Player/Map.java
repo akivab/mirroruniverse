@@ -3,8 +3,9 @@ package mirroruniverse.G5Player;
 import java.util.Arrays;
 
 public class Map {
-	private int[][] grid;
-	public int[] pos;
+	int[][] grid;
+	int[] pos;
+
 	private int VIEW_SIZE;
 	private int changed;
 	public static final int WIN_SIZE = 200;
@@ -12,6 +13,7 @@ public class Map {
 	public static final int GOAL = 2;
 	public static final int WALL = 1;
 	public static final int FLOOR = 0;
+	public boolean goalSeen = false;
 	public static int[][] M2D = { { 4, 3, 2 }, { 5, 0, 1 }, { 6, 7, 8 } };
 	public static int[][] D2M = { { 0, 0 }, { 0, 1 }, { -1, 1 }, { -1, 0 },
 			{ -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
@@ -32,8 +34,8 @@ public class Map {
 		int mid = VIEW_SIZE / 2;
 		for (int i = 0; i < VIEW_SIZE; i++) {
 			for (int j = 0; j < VIEW_SIZE; j++) {
-				int[] current = new int[] { i - mid + WIN_SIZE / 2,
-						j - mid + WIN_SIZE / 2 };
+				int[] current = new int[] { i - mid + pos[0],
+						j - mid + pos[1] };
 				int value = valueAt(current);
 				if (Arrays.equals(current, pos))
 					toReturn += "*" + value;
@@ -60,7 +62,12 @@ public class Map {
 						grid[x][y] = view[i][j];
 						changed++;
 					}
-				
+					
+					if(grid[x][y] == GOAL)
+						goalSeen = true;
+					
+					if(grid[x][y] == -1)
+						throw new IllegalArgumentException("-1 WTF");
 				}
 			}
 	}
@@ -87,7 +94,12 @@ public class Map {
 	}
 
 	private boolean isValid(int currentValue, int nextValue) {
-		return ((currentValue!=UNSEEN && nextValue == UNSEEN) || currentValue == nextValue || nextValue == GOAL) && (currentValue != -1 && nextValue != -1);
+		if(currentValue != -1 && nextValue != -1)
+			if(currentValue != GOAL || nextValue == GOAL)
+				if(currentValue != WALL && nextValue != WALL)
+					if(currentValue != UNSEEN || nextValue != UNSEEN)
+						return true;
+		return false;
 	}
 	
 	private boolean isValid(int dir){

@@ -22,13 +22,16 @@ public class Search {
 		ArrayList<State> unseen = new ArrayList<State>();
 		ArrayList<State> partial = new ArrayList<State>();
 		// stage 1
-		while (!queue.isEmpty()) {
+		while (!queue.isEmpty() && seen.size() < 3000) {
 			State current = queue.remove(0);
-			DEBUG.println(current.encoded());
+			//DEBUG.println(current.encoded());
 			if (current.isFull())
 				return current;
 			if (current.isUnseen())
-				unseen.add(current);
+				if(!m1.goalSeen || !m2.goalSeen)
+					return current;
+				else
+					unseen.add(current);
 			else if (current.isPartial())
 				partial.add(current);
 			else{

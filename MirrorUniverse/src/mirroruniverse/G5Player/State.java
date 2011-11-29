@@ -37,7 +37,7 @@ public class State {
 	}
 	
 	public boolean isNotWorthGoingTo(){
-		return !isUnseen() && !isFull() && !isPartial();
+		return !isFull() || !isUnseen() || (isPartial() && (!m1.goalSeen || !m2.goalSeen || m1.isModified() || m2.isModified()) );
 	}
 	
 	public static String encode(int[] p1, int[] p2) {
@@ -64,5 +64,9 @@ public class State {
 	
 	public String encoded(){
 		return encode(p1, p2);
+	}
+	
+	public String toString(){
+		return encode(p1,p2) + "; v=" + m1.valueAt(p1) + "," + m2.valueAt(p2);
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Scanner;
 import mirroruniverse.sim.Player;
 
 public class G5Player implements Player {
-	public static boolean ON = false;
+	public static boolean ON = true;
 	Map leftMap, rightMap;
 	State end;
 	ArrayList<Integer> moves;
@@ -14,12 +14,10 @@ public class G5Player implements Player {
 
 	public void updateMaps(int[][] lMap, int[][] rMap) {
 		if (leftMap == null && rightMap == null) {
-			DEBUG.println("Updating maps from NULL", DEBUG.LOW);
 			leftMap = new Map(lMap);
 			rightMap = new Map(rMap);
 			seen = new ArrayList<String>();
 		} else {
-			DEBUG.println("Augmenting maps", DEBUG.LOW);
 			leftMap.augment(lMap);
 			rightMap.augment(rMap);
 		}
@@ -35,17 +33,21 @@ public class G5Player implements Player {
 	 */
 	public int getMove(){
 		if(end == null || end.isNotWorthGoingTo() || moves.isEmpty()){
+			System.out.println("need to find a new goal!");
+			System.out.println(end);
+			System.out.println(moves);
 			Search s = new Search(leftMap, rightMap);
 			end = s.getEndState();
 			if(end != null)
 				moves = end.getDirections();
 		}
-		DEBUG.println(end);
-		DEBUG.println(moves);
+		System.out.println(State.encode(leftMap.pos, rightMap.pos));
+		System.out.println(end);
+		System.out.println(moves);
+		
 		if(moves!=null && !moves.isEmpty())
 			return moves.remove(0);
-		DEBUG.println(leftMap.toString());
-		DEBUG.println(rightMap.toString());
+		System.out.println("There was a problem");
 		pause();
 		return 0;
 	}
@@ -55,9 +57,13 @@ public class G5Player implements Player {
 	 */
 	public int lookAndMove(int[][] aintViewL, int[][] aintViewR){
 		updateMaps(aintViewL, aintViewR);
+		System.out.println("maps are updated. moving.");
 		int move = getMove();
 		leftMap.setNext(move);
 		rightMap.setNext(move);
+		//pause();
+		DEBUG.println(leftMap, DEBUG.MEDIUM);
+		DEBUG.println(rightMap, DEBUG.MEDIUM);
 		return move;
 	}
 	
@@ -67,7 +73,7 @@ public class G5Player implements Player {
 	 * @param aintViewR right view
 	 * @return directions to move in
 	 */
-	public int oldLookAndMove(int[][] aintViewL, int[][] aintViewR) {
+	public int oldlookAndMove(int[][] aintViewL, int[][] aintViewR) {
 		DEBUG.println("Looking and moving", DEBUG.LOW);
 		updateMaps(aintViewL, aintViewR);
 		DEBUG.println("Done updating maps", DEBUG.LOW);

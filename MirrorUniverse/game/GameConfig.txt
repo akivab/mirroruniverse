@@ -1,2 +1,2 @@
-2, 8, 2, -1, maps/downhallway.txt, 100
-2, 8, 2, -1, maps/uphallway.txt, 100
+50, 50, 2, -1, maps/secondbigmap1.txt, 100
+23, 23, 2, -1, maps/secondbigmap2.txt, 100
