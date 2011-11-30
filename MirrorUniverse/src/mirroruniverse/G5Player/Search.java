@@ -11,6 +11,7 @@ public class Search {
 		State start = new State(m1, m2);
 		queue = new ArrayList<State>();
 		seen = new ArrayList<String>();
+		seen.add(start.encoded());
 		queue.add(start);
 		this.m1 = m1;
 		this.m2 = m2;
@@ -34,7 +35,7 @@ public class Search {
 					unseen.add(current);
 			else if (current.isPartial())
 				partial.add(current);
-			else{
+			else {
 				ArrayList<State> neighbors = current.findNeighbors();
 				for (State s : neighbors)
 					if (!seen.contains(s.encoded())) {
@@ -44,11 +45,12 @@ public class Search {
 			}
 		}
 
-		if(!unseen.isEmpty())
+		if (!unseen.isEmpty())
 			return unseen.get(0);
-		while(!partial.isEmpty()){
+		// stage 2
+		while (!partial.isEmpty()) {
 			State current = partial.remove(0);
-			if(current.isFull())
+			if (current.isFull())
 				return current;
 			ArrayList<State> neighbors = current.findNeighbors();
 			for (State s : neighbors)

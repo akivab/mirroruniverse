@@ -105,7 +105,7 @@ public class Map {
 	private boolean isValid(int dir){
 		int[] next = nextPos(dir);
 		
-		return !Arrays.equals(next, pos) && isValid(valueAt(pos), valueAt(nextPos(dir)));
+		return !Arrays.equals(next, pos);
 	}
 	
 	public boolean isModified(){
