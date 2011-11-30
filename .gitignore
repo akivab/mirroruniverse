@@ -5,6 +5,6 @@ MirrorUniverse/maps/*
 MirrorUniverse/.settings/*
 MirrorUniverse/player/*
 MirrorUniverse/.classpath
-MirrorUniverse/.DS_Store
+*/.DS_Store
 MirrorUniverse/.project
 MirrorUniverse/src/mirroruniverse/dumpplayer
