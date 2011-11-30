@@ -16,8 +16,6 @@ public class Search {
 		this.m1 = m1;
 		this.m2 = m2;
 	}
-	
-	
 
 	public State getEndState() {
 		ArrayList<State> unseen = new ArrayList<State>();
@@ -25,11 +23,11 @@ public class Search {
 		// stage 1
 		while (!queue.isEmpty() && seen.size() < 3000) {
 			State current = queue.remove(0);
-			//DEBUG.println(current.encoded());
+			// DEBUG.println(current.encoded());
 			if (current.isFull())
 				return current;
 			if (current.isUnseen())
-				if(!m1.goalSeen || !m2.goalSeen)
+				if (!m1.goalSeen || !m2.goalSeen)
 					return current;
 				else
 					unseen.add(current);
