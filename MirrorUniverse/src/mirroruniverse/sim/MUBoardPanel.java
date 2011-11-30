@@ -6,44 +6,18 @@
  */
 package mirroruniverse.sim;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Point;
-import java.awt.RenderingHints.Key;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public final class MUBoardPanel extends JPanel implements MouseMotionListener {
@@ -60,7 +34,6 @@ public final class MUBoardPanel extends JPanel implements MouseMotionListener {
 	private int intYLength;
 	private int[][] aintFog;
 
-	private static HashMap<String, Image> icons = new HashMap<String, Image>();
 	private static int cacheWidth = 0;
 	Cursor curCursor;
 	
@@ -87,10 +60,8 @@ public final class MUBoardPanel extends JPanel implements MouseMotionListener {
 		if (board == null)
 			return;
 		int w = (int) MUBoard.toScreenSpaceNoOffset(1);
-		if (w != cacheWidth) {
+		if (w != cacheWidth)
 			cacheWidth = w;
-			icons = new HashMap<String, Image>();
-		}
 		int[][] counts = new int[MUGameConfig.d * 2 + 1][MUGameConfig.d * 2 + 1];
 		for (int i = 0; i < counts.length; i++) {
 			for (int j = 0; j < counts.length; j++)
@@ -237,26 +208,32 @@ public final class MUBoardPanel extends JPanel implements MouseMotionListener {
 		updateFog( mumMap.getLocation() );
 		this.repaint();
 	}
+
+	public int[] getBoardLocation()
+	{
+		return mumMap.getLocation();
+	}
 	
 	public boolean getFinished()
 	{
 		return mumMap.getMapOver();
 	}
 	
-	public void move( int intDirection )
+	public boolean move( int intDirection )
 	{
-		mumMap.move( intDirection );
+		boolean moved = mumMap.move( intDirection );
 		int[] aintLocation = mumMap.getLocation();
 		updateFog( aintLocation );
 		this.repaint();
+		return moved;
 	}
 
 	private void updateFog(int[] aintLocation) 
 	{
 		int intSightRadius = mumMap.getSightRadius();
-		for ( int i = aintLocation[ 0 ] - intSightRadius + 1; i < aintLocation[ 0 ] + intSightRadius; i ++ )
+		for ( int i = aintLocation[ 0 ] - intSightRadius; i <= aintLocation[ 0 ] + intSightRadius; i ++ )
 		{
-			for ( int j = aintLocation[ 1 ] - intSightRadius + 1; j < aintLocation[ 1 ] + intSightRadius; j ++ )
+			for ( int j = aintLocation[ 1 ] - intSightRadius; j <= aintLocation[ 1 ] + intSightRadius; j ++ )
 			{
 				if ( i >= 0 && j >= 0 && i < intXLength && j < intYLength )
 				{

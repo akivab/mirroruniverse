@@ -98,6 +98,7 @@ public class MirrorUniverse
 			int[][] aintViewR = mumMapR.getView();
 			int intMove = plrCurrent.lookAndMove( aintViewL, aintViewR );
 			try {
+				System.out.println( intStep + ":::::" );
 				if ( intStep != 0 )
 				{
 					bfrReplay.write( ", " );

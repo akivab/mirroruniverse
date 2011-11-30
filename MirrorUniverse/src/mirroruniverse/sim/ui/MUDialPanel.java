@@ -3,12 +3,13 @@ package mirroruniverse.sim.ui;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 
 public class MUDialPanel extends JPanel
 {
+	private static final long serialVersionUID = 1771335955348728767L;
+
 	protected JButton LU;
 	protected JButton U;
 	protected JButton RU;
@@ -22,7 +23,6 @@ public class MUDialPanel extends JPanel
 	public MUDialPanel() 
 	{
 		setLayout(new GridLayout(3,3));
-		Dimension dmsDialButton = new Dimension( 10, 10 );
 		LU = new JButton( "LU" );
 		LU.setName("LU");
 		LU.setActionCommand( "LU" );

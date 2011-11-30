@@ -21,13 +21,13 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 public final class MUControlPanel extends JPanel{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	protected JCheckBox manual;;
+
+	private static final long serialVersionUID = -1949617167769627252L;
+
+	protected JCheckBox manual;
 	protected JCheckBox fog;
 	protected JButton load;
+	protected JButton back;
 	protected JButton step;
 	protected JButton play;
 	protected JButton pause; 
@@ -41,7 +41,7 @@ public final class MUControlPanel extends JPanel{
 	
 	protected MUControlPanel(){
 		manual = new JCheckBox("Manual");
-		CheckHandler chdManual = new CheckHandler();
+//		CheckHandler chdManual = new CheckHandler();
 //		manual.addItemListener( chdManual );
 //		manual.addKeyListener( chdManual );
 		manual.setName("Manual");
@@ -55,6 +55,11 @@ public final class MUControlPanel extends JPanel{
 		load.setName("Load");
 		load.setActionCommand("Load");
 		load.setEnabled(true);
+
+		back = new JButton("Back");
+		back.setName("Back");
+		back.setEnabled(false);
+		back.setActionCommand("Back");
 		
 		step = new JButton("Step");
 		step.setName("Step");
@@ -79,6 +84,7 @@ public final class MUControlPanel extends JPanel{
 		add(manual);
 		add(fog);
 		add(load);
+		add(back);
 		add(step);
 		add(play);
 		add(pause);
@@ -113,6 +119,7 @@ public final class MUControlPanel extends JPanel{
 		load.addActionListener(a);
 		pause.addActionListener(a);
 		play.addActionListener(a);
+		back.addActionListener(a);
 		step.addActionListener(a);
 		stop.addActionListener(a);
 	}
@@ -132,51 +139,38 @@ public final class MUControlPanel extends JPanel{
 		totalScore.setText( Integer.toString( intTotalScore ) );
 		diffScore.setText( Integer.toString( intDiffScore ) );
 	}
-	
+
+	@SuppressWarnings("unused")
 	private class CheckHandler implements ItemListener, KeyListener
 	{
-
 		@Override
 		public void itemStateChanged(ItemEvent arg0) 
 		{
 			if ( manual.isSelected() )
 			{
 				load.setEnabled(false);
-				
 				step.setEnabled(false);
-				
+				back.setEnabled(false);
 				play.setEnabled(false);
-				
 				pause.setEnabled(false);
 			}
 			else
 			{
 				load.setEnabled(true);
-				
 				step.setEnabled(true);
-				
-				play.setEnabled(true);
-				
+				back.setEnabled(true);
+				play.setEnabled(true);				
 				pause.setEnabled(true);
 			}
 		}
 
 		@Override
-		public void keyPressed(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void keyPressed(KeyEvent arg0) {}
 
 		@Override
-		public void keyReleased(KeyEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void keyReleased(KeyEvent arg0) {}
 
 		@Override
-		public void keyTyped(KeyEvent key) 
-		{ 
-		}
-		
+		public void keyTyped(KeyEvent key) {}
 	}
 }

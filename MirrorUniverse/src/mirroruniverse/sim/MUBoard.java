@@ -6,27 +6,7 @@
  */
 package mirroruniverse.sim;
 
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
-import java.util.Stack;
 
 
 /**
@@ -38,10 +18,6 @@ public final class MUBoard {
 	public static double pixels_per_pixel = 10;
 	private int width;
 	private int height;
-	
-	private double round(double n) {
-		return Math.round(100 * n) / 100;
-	}
 
 	public static Point2D toScreenSpace(Point2D point2d) {
 		Point2D clone = new Point2D.Double();

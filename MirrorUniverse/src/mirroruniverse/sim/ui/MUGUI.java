@@ -6,9 +6,7 @@
  */
 package mirroruniverse.sim.ui;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridLayout;
 
 import mirroruniverse.sim.*;
@@ -20,16 +18,17 @@ import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.XMLDecoder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 
 public final class MUGUI extends JFrame implements ActionListener, ChangeListener
 {
+	private static final long serialVersionUID = 6520596470885212032L;
+
 	private MUControlPanel controlPanel;
 	private MUBoardPanel boardPanelL;
 	private MUBoardPanel boardPanelR;
@@ -38,7 +37,6 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 	private MUDialPanel dialPanel;
 	
 	private volatile boolean fast;
-	private boolean loading = false;
 	private int[] aintReplay;
 	private int intStepIndex;
 	
@@ -53,28 +51,29 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 		setMinimumSize(new Dimension(1200, 700));
 		setLocation(10,200);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		whoMoved = new LinkedList <Integer> ();
+		manualMove = new LinkedList <Integer> ();
+
 		controlPanel = new MUControlPanel();
 		controlPanel.load.setText("Load");
 
-		
 		gamePanel = new JPanel(new BorderLayout());
 		gamePanel.setName("Game Play");
 		gamePanel.add(controlPanel, BorderLayout.NORTH);
-		
+
 		mapPanel = new JPanel( new GridLayout( 1, 2 ) );
 		boardPanelL = new MUBoardPanel();
 		boardPanelR = new MUBoardPanel();
 
 		mapPanel.add( boardPanelL );
 		mapPanel.add( boardPanelR );
-		
+
 		gamePanel.add(mapPanel, BorderLayout.CENTER);
-		
+
 		dialPanel = new MUDialPanel();
 		gamePanel.add( dialPanel, BorderLayout.SOUTH );
 		dialPanel.setVisible( false );
-		
+
 		getContentPane().add( gamePanel );
 		this.pack();
 		this.setVisible(true);
@@ -88,23 +87,17 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 	}
 
 	public static void main(String[] args) {
-		JFrame f = new MUGUI();
+		new MUGUI();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) 
 	{
-		Component c = this;
 		String command = arg0.getActionCommand();
 		if (command.compareToIgnoreCase("Load") == 0) {
-
 			chooser.setCurrentDirectory( new File( "replays" ) );
 			int returnVal = chooser.showOpenDialog(this);
-
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-
-				loading = true;
-
 				try {
 					Scanner replayScanner = new Scanner( new FileInputStream( chooser.getSelectedFile()) );
 					String strMapConfigL = replayScanner.nextLine();
@@ -124,7 +117,6 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 					{
 						aintReplay[ i ] = Integer.parseInt( astrReplay[ i ] );
 					}
-					
 					if ( !controlPanel.manual.isSelected() )
 					{
 						String[] astrScore = strScore.split( ", " );
@@ -143,7 +135,6 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 //				JOptionPane.showMessageDialog((Frame) c,
 //						"File loaded successfully.", "Success",
 //						JOptionPane.INFORMATION_MESSAGE);
-				loading = false;
 				// }catch(IOException e){
 				// // e.printStackTrace();
 				// JOptionPane.showMessageDialog( (Frame)c, e, "Load Error",
@@ -154,16 +145,11 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 				{
 					controlPanel.load.setEnabled(false);
 					fast = false;
-					if (true) {
-						controlPanel.stop.setEnabled(true);
-						controlPanel.play.setEnabled(true);
-						controlPanel.pause.setEnabled(false);
-						controlPanel.step.setEnabled(true);
-					} else {
-						// game set up failed. Turn the right buttons on/off.
-						controlPanel.load.setEnabled(true);
-						controlPanel.tournament.setEnabled(true);
-					}
+					controlPanel.stop.setEnabled(true);
+					controlPanel.back.setEnabled(false);
+					controlPanel.play.setEnabled(true);
+					controlPanel.pause.setEnabled(false);
+					controlPanel.step.setEnabled(true);
 				}
 			}
 			// disable the begin button and the configPanel (freeze the config)
@@ -171,10 +157,13 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 			this.repaint();
 		} else if (command.compareToIgnoreCase("Step") == 0) {
 			nextStep();
+		} else if (command.compareToIgnoreCase("Back") == 0) {
+			backStep();
 		} else if (command.compareToIgnoreCase("Play") == 0) {
 			controlPanel.step.setEnabled(false);
 			controlPanel.play.setEnabled(false);
 			controlPanel.pause.setEnabled(true);
+			controlPanel.back.setEnabled(false);
 			controlPanel.load.setEnabled(false);
 			controlPanel.stop.setEnabled(true);
 			fast = true;
@@ -185,6 +174,7 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 			fast = false;
 			controlPanel.step.setEnabled(true);
 			controlPanel.play.setEnabled(true);
+			controlPanel.back.setEnabled(true);
 			controlPanel.pause.setEnabled(false);
 			controlPanel.load.setEnabled(false);
 			controlPanel.stop.setEnabled(true);
@@ -192,6 +182,7 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 			fast = false;
 			controlPanel.stop.setEnabled(false);
 			controlPanel.play.setEnabled(false);
+			controlPanel.back.setEnabled(false);
 			controlPanel.pause.setEnabled(false);
 			controlPanel.step.setEnabled(false);
 			controlPanel.load.setEnabled(true);
@@ -203,6 +194,7 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 				dialPanel.setVisible( true );
 				controlPanel.stop.setEnabled(false);
 				controlPanel.play.setEnabled(false);
+				controlPanel.back.setEnabled(false);
 				controlPanel.pause.setEnabled(false);
 				controlPanel.step.setEnabled(false);
 				controlPanel.load.setEnabled(true);
@@ -216,6 +208,7 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 				controlPanel.stop.setEnabled(false);
 				controlPanel.play.setEnabled(false);
 				controlPanel.pause.setEnabled(false);
+				controlPanel.back.setEnabled(false);
 				controlPanel.step.setEnabled(false);
 				controlPanel.load.setEnabled(true);
 				intStepIndex = 0;
@@ -252,6 +245,21 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 			throw new RuntimeException("Unknow Action Command: " + command);
 		}
 	}
+
+	private static int reverse(int direction) {
+		switch (direction) {
+			case 4: return 8;
+			case 3: return 7;
+			case 2: return 6;
+			case 5: return 1;
+			case 1: return 5;
+			case 6: return 2;
+			case 7: return 3;
+			case 8: return 4;
+			case 0: return 0;
+		}
+		return -1;
+	}
 	
 	private class GameRunner extends Thread implements ChangeListener {
 		private JSlider slider;
@@ -282,13 +290,20 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 			}
 		}
 	}
+
+	private LinkedList <Integer> whoMoved;
+	private LinkedList <Integer> manualMove;
 	
 	private void nextStep( int intMoveTo) 
 	{
 		if ( intStepIndex < aintReplay.length )
 		{
-			boardPanelL.move( intMoveTo );
-			boardPanelR.move( intMoveTo );
+			manualMove.offerLast(intMoveTo);
+			boolean m1 = boardPanelL.move( intMoveTo );
+			boolean m2 = boardPanelR.move( intMoveTo );
+			int whoMovedNow = m1 && m2 ? 0 : (m1 ? 1 : 2);
+			System.out.println(whoMovedNow);
+			whoMoved.offerLast(whoMovedNow);
 			intStepIndex ++ ;
 		}
 		if ( boardPanelL.getFinished() ^ boardPanelR.getFinished() )
@@ -296,6 +311,7 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 			intDiffScore ++;
 			controlPanel.diffScore.setText( Integer.toString( intDiffScore ) );
 		}
+		controlPanel.back.setEnabled(true);
 		controlPanel.setStepText( intStepIndex );
 	}
 
@@ -303,21 +319,40 @@ public final class MUGUI extends JFrame implements ActionListener, ChangeListene
 	{
 		if ( intStepIndex < aintReplay.length )
 		{
-			boardPanelL.move( aintReplay[ intStepIndex ] );
-			boardPanelR.move( aintReplay[ intStepIndex ] );
+			boolean m1 = boardPanelL.move( aintReplay[ intStepIndex ] );
+			boolean m2 = boardPanelR.move( aintReplay[ intStepIndex ] );
+			int whoMovedNow = m1 && m2 ? 0 : (m1 ? 1 : 2);
+			whoMoved.offerLast(whoMovedNow);
 			intStepIndex ++ ;
 		}
 		if ( intStepIndex == aintReplay.length )
+			controlPanel.step.setEnabled(false);
+		controlPanel.back.setEnabled(true);
+		controlPanel.setStepText( intStepIndex );
+	}
+
+	private void backStep()
+	{
+		if (intStepIndex != 0)
 		{
-			controlPanel.step.setEnabled( false );
+			intStepIndex --;
+			int movedTo;
+			if (manualMove.isEmpty())
+				movedTo = aintReplay [ intStepIndex ];
+			else
+				movedTo = manualMove.pollLast();
+			int whoMovedNow = whoMoved.pollLast();
+			boolean m1 = (whoMovedNow == 0 || whoMovedNow == 1);
+			boolean m2 = (whoMovedNow == 0 || whoMovedNow == 2);
+			if (m1) boardPanelL.move( reverse( movedTo ) );
+			if (m2) boardPanelR.move( reverse( movedTo ) );
 		}
+		if (intStepIndex == 0)
+			controlPanel.back.setEnabled(false);
+		controlPanel.step.setEnabled(true);
 		controlPanel.setStepText( intStepIndex );
 	}
 
 	@Override
-	public void stateChanged(ChangeEvent arg0) 
-	{
-		// TODO Auto-generated method stub
-		
-	}
+	public void stateChanged(ChangeEvent arg0) {}
 }

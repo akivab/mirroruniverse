@@ -1,0 +1,10 @@
+MirrorUniverse/bin/*
+MirrorUniverse/replays/*
+MirrorUniverse/game/*
+MirrorUniverse/maps/*
+MirrorUniverse/.settings/*
+MirrorUniverse/player/*
+MirrorUniverse/.classpath
+MirrorUniverse/.DS_Store
+MirrorUniverse/.project
+MirrorUniverse/src/mirroruniverse/dumpplayer

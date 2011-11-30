@@ -5,30 +5,10 @@
 
 package mirroruniverse.sim;
 
-import java.awt.Point;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Properties;
 import java.util.Random;
-import java.util.Scanner;
-
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
-
-
-//import org.apache.log4j.Logger;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 
 public class MUGameConfig {
@@ -66,7 +46,7 @@ public class MUGameConfig {
 	}
 
 	public void setR(int r) {
-		this.r = r;
+		MUGameConfig.r = r;
 	}
 
 	public int getR() {
@@ -79,14 +59,9 @@ public class MUGameConfig {
 	private ArrayList<File> availableBoards;
 
 //	private Logger log = Logger.getLogger(this.getClass());
-	private File boardFile;
 	int num_lights = 5;
 
 	public static final int max_rounds_max = 4000;
-
-	public void setSelectedBoard(File f) {
-		boardFile = f;
-	}
 
 	/**
 	 * Obtain the list of all valid boards in the location specified by the xml
@@ -137,10 +112,6 @@ public class MUGameConfig {
 			 */
 			availableBoards.add(files[i]);
 		}
-		if (availableBoards.size() > 0)
-			boardFile = availableBoards.get(0);
-		else
-			boardFile = null;
 	}
 
 }
