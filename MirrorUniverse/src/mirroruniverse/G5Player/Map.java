@@ -14,6 +14,8 @@ public class Map {
 	public static final int WALL = 1;
 	public static final int FLOOR = 0;
 	public boolean goalSeen = false;
+	int[] avg;
+	int[] goal;
 	public static int[][] M2D = { { 4, 3, 2 }, { 5, 0, 1 }, { 6, 7, 8 } };
 	public static int[][] D2M = { { 0, 0 }, { 0, 1 }, { -1, 1 }, { -1, 0 },
 			{ -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
@@ -22,9 +24,10 @@ public class Map {
 		DEBUG.println("Initializing this new map", DEBUG.LOW);
 		grid = new int[WIN_SIZE][WIN_SIZE];
 		pos = new int[] { WIN_SIZE / 2, WIN_SIZE / 2 };
-
+		goal = new int[]{0,0};
+		avg = new int[]{0,0};
 		initialize();
-		VIEW_SIZE = view.length * 3;
+		VIEW_SIZE = 20;
 		augment(view);
 		DEBUG.println("Done setting up", DEBUG.LOW);
 	}
@@ -49,6 +52,8 @@ public class Map {
 
 	public void augment(int[][] view) {
 		int mid = view.length / 2;
+		int avgcount = 0;
+		avg[0] = avg[1] = 0;
 		changed = 0;
 		for (int i = 0; i < view.length; i++)
 			for (int j = 0; j < view.length; j++) {
@@ -63,13 +68,28 @@ public class Map {
 						changed++;
 					}
 					
-					if(grid[x][y] == GOAL)
+					
+					if(grid[x][y] == GOAL){
+						goal[0] = x;
+						goal[1] = y;
 						goalSeen = true;
+					}
 					
 					if(grid[x][y] == -1)
 						throw new IllegalArgumentException("-1 WTF");
 				}
 			}
+		for(int i = 0; i < grid.length; i++)
+			for(int j = 0; j < grid.length; j++)
+				if(grid[i][j] == FLOOR){
+					avgcount++;
+					avg[0] += i;
+					avg[1] += j;
+				}
+		if(avgcount > 0){
+		avg[0] /= avgcount;
+		avg[1] /= avgcount;
+		}
 	}
 
 	public int[] nextPos(int[] pos, int direction){
@@ -85,12 +105,27 @@ public class Map {
 	public int[] nextPos(int direction) {
 		return nextPos(pos, direction);
 	}
+	
+	public int distanceToGoal(int[] pos){
+		int a = pos[0] - goal[0];
+		int b = pos[1] - goal[1];
+		return a*a+b*b;
+	}
 
 	private void initialize() {
 		DEBUG.println("Initializing", DEBUG.LOW);
 		for (int i = 0; i < grid.length; i++)
 			for (int j = 0; j < grid[0].length; j++)
 				grid[i][j] = UNSEEN;
+	}
+	
+	public int value(int[] pos){
+		int count = 0;
+		for(int i = -1; i <= 1; i++)
+			for(int j = -1; j <= 1; j++)
+				if(valueAt(new int[]{pos[0]+i, pos[1]+j}) == UNSEEN)
+					count++;
+		return count;
 	}
 
 	private boolean isValid(int currentValue, int nextValue) {
@@ -105,7 +140,7 @@ public class Map {
 	private boolean isValid(int dir){
 		int[] next = nextPos(dir);
 		
-		return !Arrays.equals(next, pos);
+		return !Arrays.equals(next, pos) && isValid(valueAt(pos), valueAt(nextPos(dir)));
 	}
 	
 	public boolean isModified(){
