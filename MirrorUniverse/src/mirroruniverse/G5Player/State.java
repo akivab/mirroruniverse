@@ -81,7 +81,8 @@ public class State {
 		else{
 			int a = m1.distanceToGoal(p1);
 			int b = m2.distanceToGoal(p2);
-			val += a * a * a * a + b * b * b * b;
+			int c = (a-b);
+			val += a + b + c * c * c * c;
 		}
 		return val * val * val + level;
 	}
