@@ -71,18 +71,40 @@ public class State {
 		int val = 0;
 		if(G5Player.seen.contains(encoded()))
 			val = 100 ;
-		
+
 		if(!m1.goalSeen || !m2.goalSeen){
 			if(!m1.goalSeen)
+			{
 				val -= m1.value(p1)*m1.value(p1);
+//				val += m1.distanceToClosestFrontier(p1);
+			}
 			if(!m2.goalSeen)
+			{
 				val -= m2.value(p2)*m2.value(p2);
+//				val += m2.distanceToClosestFrontier(p2);
+			}
 		}
-		else{
+		else if (this.isPartial()){
 			int a = m1.distanceToGoal(p1);
 			int b = m2.distanceToGoal(p2);
-			val += a * a * a * a + b * b * b * b;
+			int c = (a-b);
+			val += a + b + c * c * c * c;
+/*			if (!m1.isFullyExplored())
+			{
+				val -= m1.value(p1)*m1.value(p1);
+				val += m1.distanceToClosestFrontier(p1);
+			}
+			if (!m2.isFullyExplored())
+			{
+				val -= m2.value(p2)*m2.value(p2);
+				val += m2.distanceToClosestFrontier(p2);
+			}*/
 		}
+/*		else if (!this.isFull())
+		{
+			val += m1.distanceToClosestFrontier(p1);
+			val += m2.distanceToClosestFrontier(p2);
+		}*/
 		return val * val * val + level;
 	}
 

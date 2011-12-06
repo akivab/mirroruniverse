@@ -1,2 +1,2 @@
-5, 5, 2, -1, maps/testMap.txt, 100
-50, 50, 2, -1, maps/secondbigmap2.txt, 100
+5, 5, 2, -1, maps/PipeMaze_A.txt, 100
+50, 50, 2, -1, maps/PipeMaze_B.txt, 100

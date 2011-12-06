@@ -1,11 +1,18 @@
 package mirroruniverse.G5Player;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Vector;
 
 public class Map {
 	int[][] grid;
 	int[] pos;
 
+	public Vector<ComparablePoint> frontierPoints;
+/*	public Vector<FrontierSearchNode> toExplore;
+	public Vector<FrontierSearchNode> explored;*/
+	private int distanceToGoal;
+	private int distanceToFrontier;
 	private int VIEW_SIZE;
 	private int changed;
 	public static final int WIN_SIZE = 200;
@@ -27,6 +34,7 @@ public class Map {
 		goal = new int[]{0,0};
 		avg = new int[]{0,0};
 		initialize();
+		frontierPoints = new Vector<Map.ComparablePoint>();
 		VIEW_SIZE = 20;
 		augment(view);
 		DEBUG.println("Done setting up", DEBUG.LOW);
@@ -63,11 +71,32 @@ public class Map {
 					if(grid[x][y] == 1 && view[i][j] == 0){
 						throw new IllegalArgumentException("View inconsistent");
 					}
+					
+					ComparablePoint thisPoint = new ComparablePoint(new int[] {x, y});
+					if (frontierPoints.contains(thisPoint))
+					{
+						frontierPoints.remove(thisPoint);
+					}
 					if (grid[x][y] != view[i][j]) {
 						grid[x][y] = view[i][j];
 						changed++;
 					}
-					
+					if (valueAt(thisPoint.position) == FLOOR)
+					{
+						for (int h = -1; h <= 1; ++h)
+						{
+							for (int k = -1; k <= 1; ++k)
+							{
+								int[] next = new int[] { thisPoint.position[0]+h, thisPoint.position[1]+k };
+								ComparablePoint nextPoint = new ComparablePoint(next);
+								if (valueAt(nextPoint.position) == UNSEEN)
+								{
+									if (!frontierPoints.contains(nextPoint))
+										frontierPoints.add(nextPoint);
+								}
+							}
+						}
+					}					
 					
 					if(grid[x][y] == GOAL){
 						goal[0] = x;
@@ -110,6 +139,7 @@ public class Map {
 		int a = pos[0] - goal[0];
 		int b = pos[1] - goal[1];
 		return a*a+b*b;
+//		return distanceToGoal;
 	}
 
 	private void initialize() {
@@ -125,7 +155,10 @@ public class Map {
 			for(int j = -1; j <= 1; j++)
 				if(valueAt(new int[]{pos[0]+i, pos[1]+j}) == UNSEEN)
 					count++;
+		
+//		count += distanceToClosestFrontier(pos);
 		return count;
+//		if(frontierPoints.contains(new ComparablePoint(new int[] {pos[0]+i, pos[1]+j})))
 	}
 
 	private boolean isValid(int currentValue, int nextValue) {
@@ -164,6 +197,101 @@ public class Map {
 		return pos;
 	}
 	
+	public boolean atFrontier(int[] position)
+	{
+		if (valueAt(position) == UNSEEN)
+		{
+			for (int i = 1; i < 9; ++i)
+			{
+				if (valueAt(nextPos(position, i)) == FLOOR)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public int distanceToClosestFrontier()
+	{
+		return distanceToClosestFrontier(this.pos);
+	}
+	
+	public int distanceToClosestFrontier(int[] position)
+	{
+		if (isFullyExplored())
+		{
+			return -1;
+		}
+		int a, b, distance;
+		int bestDistance = Integer.MAX_VALUE;
+		for (ComparablePoint cp : frontierPoints)
+		{
+			a = position[0] - cp.position[0];
+			b = position[1] - cp.position[1];
+			distance = a*a+b*b;
+			if (distance < bestDistance)
+			{
+				bestDistance = distance;
+			}
+		}
+		return bestDistance;
+	}
+	
+/*	public int locateFrontier() {
+		distanceToFrontier = -1;
+		frontierNodes = new Vector<int[]>();
+		toExplore = new Vector<FrontierSearchNode>();
+		explored = new Vector<FrontierSearchNode>();
+		
+		toExplore.add(new FrontierSearchNode(pos, 0));
+		while (!toExplore.isEmpty())
+		{
+//			System.out.println("Exploring...");
+			FrontierSearchNode thisNode = toExplore.get(0);
+			int[] thisPos = thisNode.position;
+			int thisDist = thisNode.distance;
+			if (atFrontier(thisPos))
+			{
+				if (frontierNodes.isEmpty())
+				{
+					distanceToFrontier = thisDist;
+				}
+				frontierNodes.add(thisPos);
+			}
+			if (valueAt(thisPos) == GOAL)
+			{
+				distanceToGoal = thisDist;
+			}
+			explored.add(thisNode);
+			int nextDist = ++thisDist;
+			for (int i = 1; i < 9; ++i)
+			{
+				int[] newpos = nextPos(thisPos, i);
+				if (!explored.contains(new FrontierSearchNode(newpos, 0)) && !toExplore.contains(new FrontierSearchNode(newpos, 0)))
+				{
+					toExplore.add(new FrontierSearchNode(newpos, nextDist));
+				}
+			}
+			toExplore.remove(0);
+		}*/
+		
+/*		System.out.print("Frontier: ");
+		for (int i = 0; i < frontierNodes.size(); ++i)
+		{
+			int[] frontierPos = frontierNodes.get(i);
+			System.out.print("(" + frontierPos[0] + "," + frontierPos[1] + ")   ");
+		}
+		System.out.println();
+		
+		return distanceToFrontier;
+	}*/
+	
+	public boolean isFullyExplored()
+	{
+		return (frontierPoints.isEmpty());
+	}
+	
 	public int[] getDirections(){
 		boolean[] vals = validDirections();
 		int count = 0;
@@ -187,5 +315,35 @@ public class Map {
 				DEBUG.println(Arrays.toString(nextPos(i)) + " " + i + " " + valueAt(nextPos(i)));
 		}
 		return toreturn;
+	}
+	
+	private class ComparablePoint
+	{
+		int[] position;
+		
+		public ComparablePoint(int[] pos)
+		{
+			position = pos;
+		}
+		
+		@Override
+		public boolean equals(Object o)
+		{
+			if (!(o instanceof ComparablePoint))
+			{
+				return false;
+			}
+			ComparablePoint other = (ComparablePoint) o;
+			if (other.position[0] == this.position[0] && other.position[1] == this.position[1])
+			{
+				return true;
+			}
+			return false;
+		}
+		
+		public String toString()
+		{
+			return ("(" + position[0] + "," + position[1] + ")");
+		}
 	}
 }
