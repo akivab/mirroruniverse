@@ -35,7 +35,7 @@ public class G5Player implements Player {
 	 */
 	public int getMove() {
 		if ((end == null || moves.isEmpty())) {
-			System.out.println("here");
+			DEBUG.println("here");
 			if (full && !moves.isEmpty())
 				return moves.remove(0);
 			if (seenCount != 0 && !leftMap.isStillExplorable()
@@ -50,9 +50,9 @@ public class G5Player implements Player {
 
 			if (end != null)
 				moves = end.getDirections();
-			System.out.println(end);
-			System.out.println(moves);
-			System.out.println(leftMap.arr2str(leftMap.goalVal, leftMap.pos));
+			DEBUG.println(end);
+			DEBUG.println(moves);
+			DEBUG.println(leftMap.arr2str(leftMap.goalVal, leftMap.pos));
 		}
 		DEBUG.println(State.encode(leftMap.pos, rightMap.pos));
 		DEBUG.println(end);

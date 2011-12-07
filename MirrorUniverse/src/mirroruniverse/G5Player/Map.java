@@ -63,7 +63,7 @@ public class Map {
 
 	public void augment(int[][] view) {
 		int mid = view.length / 2;
-		System.out.println("augmenting view");
+		DEBUG.println("augmenting view");
 		changed = 0;
 		for (int i = 0; i < view.length; i++)
 			for (int j = 0; j < view.length; j++) {

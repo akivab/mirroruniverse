@@ -2,13 +2,15 @@ package mirroruniverse.G5Player;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 public class Search {
 	Queue<State> queue, partial, queue2;
-	ArrayList<String> seen;
+	Set<String> seen;
 	boolean fullSearch;
 	Map m1, m2;
 
@@ -20,7 +22,7 @@ public class Search {
 		queue = new PriorityQueue<State>(10, s);
 		partial = new LinkedList<State>();
 		queue2 = new PriorityQueue<State>(10, s2);
-		seen = new ArrayList<String>();
+		seen = new HashSet<String>();
 		queue.add(start);
 		queue2.add(start);
 		this.m1 = m1;
@@ -33,7 +35,9 @@ public class Search {
 		
 		boolean endGame = (!m1.isStillExplorable() && !m2.isStillExplorable());
 		if (fullSearch || endGame) {
-			while (!queue2.isEmpty() && (endGame && seen.size() < 80000 || seen.size() < 80000)) {
+			while (!queue2.isEmpty()) {
+				if(seen.size() % 1000 == 0 )
+					DEBUG.println(seen.size());
 				State current = queue2.poll();
 				far = current;
 				ArrayList<State> neighbors = current.findNeighbors();
@@ -50,8 +54,10 @@ public class Search {
 				}
 			}
 			if(endGame)
-				while (!partial.isEmpty() && seen.size() < 100000) {
+				while (!partial.isEmpty()) {
 					State current = partial.poll();
+					if(seen.size() % 100 == 0)
+						DEBUG.println(seen.size());
 					ArrayList<State> neighbors = current.findNeighbors();
 					for (State s : neighbors)
 						if (!seen.contains(s.encoded())) {
@@ -62,10 +68,12 @@ public class Search {
 						}
 				}
 		}
-		
-		seen.removeAll(seen);
+		DEBUG.println("done with endgame search");
+		seen = new HashSet<String>();
 		if(!endGame)
 			while (!queue.isEmpty()) {
+				if(seen.size() % 1000 == 0 )
+					DEBUG.println(seen.size());
 				State current = queue.poll();
 				far = current;
 				// System.out.println(current);
