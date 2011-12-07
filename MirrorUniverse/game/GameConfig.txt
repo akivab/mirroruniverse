@@ -1,2 +1,2 @@
-5, 5, 2, -1, maps/testMap.txt, 100
-50, 50, 2, -1, maps/secondbigmap2.txt, 100
+50, 50, 2, -1, maps/secondbigmap1.txt, 100
+23, 23, 2, -1, maps/secondbigmap2.txt, 100

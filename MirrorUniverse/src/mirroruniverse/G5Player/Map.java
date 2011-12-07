@@ -1,6 +1,8 @@
 package mirroruniverse.G5Player;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Vector;
 
 public class Map {
 	int[][] grid;
@@ -16,6 +18,8 @@ public class Map {
 	public boolean goalSeen = false;
 	int[] avg;
 	int[] goal;
+	int[][] frontVal;
+	int[][] goalVal;
 	public static int[][] M2D = { { 4, 3, 2 }, { 5, 0, 1 }, { 6, 7, 8 } };
 	public static int[][] D2M = { { 0, 0 }, { 0, 1 }, { -1, 1 }, { -1, 0 },
 			{ -1, -1 }, { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 } };
@@ -23,6 +27,8 @@ public class Map {
 	public Map(int[][] view) {
 		DEBUG.println("Initializing this new map", DEBUG.LOW);
 		grid = new int[WIN_SIZE][WIN_SIZE];
+		frontVal = new int[WIN_SIZE][WIN_SIZE];
+		goalVal = new int[WIN_SIZE][WIN_SIZE];
 		pos = new int[] { WIN_SIZE / 2, WIN_SIZE / 2 };
 		goal = new int[]{0,0};
 		avg = new int[]{0,0};
@@ -32,14 +38,19 @@ public class Map {
 		DEBUG.println("Done setting up", DEBUG.LOW);
 	}
 
-	public String toString() {
+	public String toString(){
+		return arr2str(grid, pos);
+	}
+	public String arr2str(int[][] grid, int[] pos) {
 		String toReturn = "";
 		int mid = VIEW_SIZE / 2;
 		for (int i = 0; i < VIEW_SIZE; i++) {
 			for (int j = 0; j < VIEW_SIZE; j++) {
 				int[] current = new int[] { i - mid + pos[0],
 						j - mid + pos[1] };
-				int value = valueAt(current);
+				int value = grid[current[0]][current[1]];
+				if(value > 9998)
+					value = valueAt(current);
 				if (Arrays.equals(current, pos))
 					toReturn += "*" + value;
 				else
@@ -52,8 +63,7 @@ public class Map {
 
 	public void augment(int[][] view) {
 		int mid = view.length / 2;
-		int avgcount = 0;
-		avg[0] = avg[1] = 0;
+		System.out.println("augmenting view");
 		changed = 0;
 		for (int i = 0; i < view.length; i++)
 			for (int j = 0; j < view.length; j++) {
@@ -63,11 +73,11 @@ public class Map {
 					if(grid[x][y] == 1 && view[i][j] == 0){
 						throw new IllegalArgumentException("View inconsistent");
 					}
+					
 					if (grid[x][y] != view[i][j]) {
 						grid[x][y] = view[i][j];
 						changed++;
-					}
-					
+					}				
 					
 					if(grid[x][y] == GOAL){
 						goal[0] = x;
@@ -79,17 +89,16 @@ public class Map {
 						throw new IllegalArgumentException("-1 WTF");
 				}
 			}
-		for(int i = 0; i < grid.length; i++)
-			for(int j = 0; j < grid.length; j++)
-				if(grid[i][j] == FLOOR){
-					avgcount++;
-					avg[0] += i;
-					avg[1] += j;
-				}
-		if(avgcount > 0){
-		avg[0] /= avgcount;
-		avg[1] /= avgcount;
+		setup(frontVal, UNSEEN);
+		bubble(frontVal);
+		if(goalSeen){
+			setup(goalVal, GOAL);
+			bubble(goalVal);
 		}
+	}
+	
+	public boolean isStillExplorable(){
+		return frontVal[pos[0]][pos[1]] < 9000;
 	}
 
 	public int[] nextPos(int[] pos, int direction){
@@ -105,27 +114,12 @@ public class Map {
 	public int[] nextPos(int direction) {
 		return nextPos(pos, direction);
 	}
-	
-	public int distanceToGoal(int[] pos){
-		int a = pos[0] - goal[0];
-		int b = pos[1] - goal[1];
-		return a*a+b*b;
-	}
 
 	private void initialize() {
 		DEBUG.println("Initializing", DEBUG.LOW);
 		for (int i = 0; i < grid.length; i++)
 			for (int j = 0; j < grid[0].length; j++)
 				grid[i][j] = UNSEEN;
-	}
-	
-	public int value(int[] pos){
-		int count = 0;
-		for(int i = -1; i <= 1; i++)
-			for(int j = -1; j <= 1; j++)
-				if(valueAt(new int[]{pos[0]+i, pos[1]+j}) == UNSEEN)
-					count++;
-		return count;
 	}
 
 	private boolean isValid(int currentValue, int nextValue) {
@@ -155,7 +149,7 @@ public class Map {
 
 	public int valueAt(int[] pos) {
 		if (pos[0] >= 0 && pos[0] < grid.length && pos[1] >= 0
-				&& pos[1] <= grid[0].length)
+				&& pos[1] < grid[0].length)
 			return grid[pos[0]][pos[1]];
 		return -1;
 	}
@@ -187,5 +181,38 @@ public class Map {
 				DEBUG.println(Arrays.toString(nextPos(i)) + " " + i + " " + valueAt(nextPos(i)));
 		}
 		return toreturn;
+	}
+	
+	public void setup(int[][] front, int value){
+		for(int i = 0; i < WIN_SIZE; i++)
+			for(int j = 0; j < WIN_SIZE; j++){
+				front[i][j] = 9999;
+				if(valueAt(new int[]{i,j}) == FLOOR)
+					for(int k = -1; k <= 1; k++)
+						for(int l = -1; l <=1; l++)
+							if(valueAt(new int[]{i+k,j+l}) == value)
+								front[i][j] = 1;
+			}
+	}
+	
+	public void bubble(int[][] front){
+		Vector<int[]> pos = new Vector<int[]>();
+		for(int i = 0; i < WIN_SIZE; i++)
+			for(int j = 0; j < WIN_SIZE; j++)
+				if(front[i][j] == 1)
+					pos.add(new int[]{i,j});
+		while(!pos.isEmpty()){
+			int[] m = pos.remove(0);
+			if(valueAt(m) != -1)
+				for(int k = 1; k <= 8; k++){
+					int[] tmpPos = nextPos(m, k);
+					if(valueAt(tmpPos) == FLOOR){
+						if(front[tmpPos[0]][tmpPos[1]] > front[m[0]][m[1]] + 1){
+							front[tmpPos[0]][tmpPos[1]] = front[m[0]][m[1]] + 1;
+							pos.add(tmpPos);
+						}
+					}
+				}
+		}
 	}
 }

@@ -38,7 +38,7 @@ public class State {
 	}
 
 	public boolean isUnseen() {
-		return (m1.valueAt(p1) >= Map.UNSEEN || m2.valueAt(p2) >= Map.UNSEEN);
+		return m1.frontVal[p1[0]][p1[1]] == 1 || m2.frontVal[p2[0]][p2[1]] == 1; 
 	}
 
 	public boolean isNotWorthGoingTo() {
@@ -68,25 +68,16 @@ public class State {
 	}
 
 	public int dist() {
-		int val = 0;
-		if(G5Player.seen.contains(encoded()))
-			val = 100 ;
-		
-		if(!m1.goalSeen || !m2.goalSeen){
-			if(!m1.goalSeen)
-				val -= m1.value(p1)*m1.value(p1);
-			if(!m2.goalSeen)
-				val -= m2.value(p2)*m2.value(p2);
-		}
-		else{
-			int a = m1.distanceToGoal(p1);
-			int b = m2.distanceToGoal(p2);
-			int c = (a-b);
-			val += a + b + c * c * c * c;
-		}
-		return val * val * val + level;
+		int i = m1.frontVal[p1[0]][p1[1]];
+		int j = m2.frontVal[p2[0]][p2[1]];
+		return i*i + j*j + level;
 	}
-
+	
+	public int goaldist() {
+		int i = m1.goalVal[p1[0]][p1[1]];
+		int j = m2.goalVal[p2[0]][p2[1]];
+		return i + j + (i-j)*(i-j);
+	}
 	public ArrayList<State> findNeighbors() {
 		ArrayList<State> states = new ArrayList<State>();
 		int[] m = list();
