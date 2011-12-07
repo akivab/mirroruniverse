@@ -42,7 +42,7 @@ public class Search {
 							return s;
 						else if (s.isPartial() && endGame)
 							partial.add(s);
-						else if (!s.isUnseen() && !endGame)
+						else if (!s.isUnseen() && !s.isPartial())
 							queue2.add(s);
 					seen.add(s.encoded());
 				}
