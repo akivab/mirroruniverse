@@ -73,10 +73,14 @@ public class State {
 		return i*i + j*j + level;
 	}
 	
+	public boolean stepsOnUnseen(){
+		return m1.valueAt(m1.pos) == Map.UNSEEN || m2.valueAt(m2.pos) == Map.UNSEEN;
+	}
+	
 	public int goaldist() {
 		int i = m1.goalVal[p1[0]][p1[1]];
 		int j = m2.goalVal[p2[0]][p2[1]];
-		return i + j + (i-j) * (i-j);
+		return i + j + (i-j) * (i-j) * 10;
 	}
 	public ArrayList<State> findNeighbors() {
 		ArrayList<State> states = new ArrayList<State>();

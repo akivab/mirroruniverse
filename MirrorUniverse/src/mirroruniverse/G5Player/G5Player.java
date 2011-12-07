@@ -10,8 +10,8 @@ public class G5Player implements Player {
 	Map leftMap, rightMap;
 	State end;
 	int seenCount = 0;
+	static ArrayList<String> seen = new ArrayList<String>();
 	ArrayList<Integer> moves;
-
 
 	public void updateMaps(int[][] lMap, int[][] rMap) {
 		if (leftMap == null && rightMap == null) {
@@ -27,23 +27,28 @@ public class G5Player implements Player {
 		Scanner in = new Scanner(System.in);
 		in.nextLine();
 	}
+
 	boolean full = false;
+
 	/**
 	 * Returns a direction to move in (0 if nothing to return)
 	 */
-	public int getMove(){
-		if((end == null || moves.isEmpty())){
+	public int getMove() {
+		if ((end == null || moves.isEmpty())) {
 			System.out.println("here");
-			if(full && !moves.isEmpty())
+			if (full && !moves.isEmpty())
 				return moves.remove(0);
-			if(seenCount != 0 && !leftMap.isStillExplorable() && !rightMap.isStillExplorable() || leftMap.goalSeen && rightMap.goalSeen && seenCount++ == 0)
+			if (seenCount != 0 && !leftMap.isStillExplorable()
+					&& !rightMap.isStillExplorable() || leftMap.goalSeen
+					&& rightMap.goalSeen && leftMap.goalReachable()
+					&& rightMap.goalReachable() && seenCount++ == 0)
 				full = true;
 			else
 				full = false;
 			Search s = new Search(leftMap, rightMap, full);
 			end = s.getEndState();
 
-			if(end != null)
+			if (end != null)
 				moves = end.getDirections();
 			System.out.println(end);
 			System.out.println(moves);
@@ -52,8 +57,8 @@ public class G5Player implements Player {
 		DEBUG.println(State.encode(leftMap.pos, rightMap.pos));
 		DEBUG.println(end);
 		DEBUG.println(moves);
-		
-		if(moves!=null && !moves.isEmpty())
+
+		if (moves != null && !moves.isEmpty())
 			return moves.remove(0);
 		pause();
 		DEBUG.println("There was a problem");
@@ -63,13 +68,14 @@ public class G5Player implements Player {
 	/**
 	 * Implementation of look and move
 	 */
-	public int lookAndMove(int[][] aintViewL, int[][] aintViewR){
+	public int lookAndMove(int[][] aintViewL, int[][] aintViewR) {
 		updateMaps(aintViewL, aintViewR);
 		DEBUG.println("maps are updated. moving.");
 		int move = getMove();
+		seen.add(State.encode(leftMap.pos, rightMap.pos));
 		leftMap.setNext(move);
 		rightMap.setNext(move);
-		//pause();
+		// pause();
 		DEBUG.println(leftMap, DEBUG.MEDIUM);
 		DEBUG.println(rightMap, DEBUG.MEDIUM);
 		return move;

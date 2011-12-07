@@ -33,7 +33,7 @@ public class Search {
 		
 		boolean endGame = (!m1.isStillExplorable() && !m2.isStillExplorable());
 		if (fullSearch || endGame) {
-			while (!queue2.isEmpty() && seen.size() < 40000) {
+			while (!queue2.isEmpty() && (endGame && seen.size() < 80000 || seen.size() < 80000)) {
 				State current = queue2.poll();
 				far = current;
 				ArrayList<State> neighbors = current.findNeighbors();
@@ -43,14 +43,14 @@ public class Search {
 							return s;
 						else if (s.isPartial() && endGame)
 							partial.add(s);
-						else if (!s.isUnseen() && !s.isPartial())
+						else if (!s.isPartial() && !s.stepsOnUnseen())
 							queue2.add(s);
 					
 					seen.add(s.encoded());
 				}
 			}
 			if(endGame)
-				while (!partial.isEmpty() && seen.size() < 50000) {
+				while (!partial.isEmpty() && seen.size() < 100000) {
 					State current = partial.poll();
 					ArrayList<State> neighbors = current.findNeighbors();
 					for (State s : neighbors)

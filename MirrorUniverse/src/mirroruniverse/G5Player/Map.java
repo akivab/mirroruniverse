@@ -195,6 +195,10 @@ public class Map {
 			}
 	}
 	
+	public boolean goalReachable(){
+		return goalVal[pos[0]][pos[1]] < 9999;
+	}
+	
 	public void bubble(int[][] front){
 		Vector<int[]> pos = new Vector<int[]>();
 		for(int i = 0; i < WIN_SIZE; i++)
