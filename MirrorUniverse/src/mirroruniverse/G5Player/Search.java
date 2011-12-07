@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class Search {
-	Queue<State> queue, partial;
+	Queue<State> queue, partial, queue2;
 	ArrayList<String> seen;
 	boolean fullSearch;
 	Map m1, m2;
@@ -18,9 +18,11 @@ public class Search {
 		this.fullSearch = full;
 		Comparator<State> s = new CompareStates();
 		queue = new PriorityQueue<State>(10, s);
-		partial = new PriorityQueue<State>(10, s);
+		partial = new LinkedList<State>();
+		queue2 = new LinkedList<State>();
 		seen = new ArrayList<String>();
 		queue.add(start);
+		queue2.add(start);
 		this.m1 = m1;
 		this.m2 = m2;
 	}
@@ -28,9 +30,9 @@ public class Search {
 	public State getEndState() {
 		State far = null;
 		// stage 1
-		if(fullSearch && !m1.isStillExplorable() && !m2.isStillExplorable()){
-			while (!queue.isEmpty() && seen.size() < 10000) {
-				State current = queue.poll();
+		if(!m1.isStillExplorable() && !m2.isStillExplorable()){
+			while (!queue2.isEmpty()) {
+				State current = queue2.poll();
 				far = current;
 				ArrayList<State> neighbors = current.findNeighbors();
 				for (State s : neighbors){
@@ -40,7 +42,7 @@ public class Search {
 						else if(s.isPartial())
 							partial.add(s);
 						else if(!s.isUnseen())
-							queue.add(s);
+							queue2.add(s);
 					seen.add(s.encoded());
 				}
 			}
