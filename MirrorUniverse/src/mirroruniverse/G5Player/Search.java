@@ -16,9 +16,10 @@ public class Search {
 		State start = new State(m1, m2);
 		this.fullSearch = full;
 		Comparator<State> s = new CompareStates();
+		Comparator<State> s2 = new CompareStates2();
 		queue = new PriorityQueue<State>(10, s);
 		partial = new LinkedList<State>();
-		queue2 = new LinkedList<State>();
+		queue2 = new PriorityQueue<State>(10, s2);
 		seen = new ArrayList<String>();
 		queue.add(start);
 		queue2.add(start);
@@ -32,7 +33,7 @@ public class Search {
 		
 		boolean endGame = (!m1.isStillExplorable() && !m2.isStillExplorable());
 		if (fullSearch || endGame) {
-			while (!queue2.isEmpty()) {
+			while (!queue2.isEmpty() && seen.size() < 40000) {
 				State current = queue2.poll();
 				far = current;
 				ArrayList<State> neighbors = current.findNeighbors();
@@ -44,11 +45,12 @@ public class Search {
 							partial.add(s);
 						else if (!s.isUnseen() && !s.isPartial())
 							queue2.add(s);
+					
 					seen.add(s.encoded());
 				}
 			}
 			if(endGame)
-				while (!partial.isEmpty()) {
+				while (!partial.isEmpty() && seen.size() < 50000) {
 					State current = partial.poll();
 					ArrayList<State> neighbors = current.findNeighbors();
 					for (State s : neighbors)
@@ -62,31 +64,37 @@ public class Search {
 		}
 		
 		seen.removeAll(seen);
-
-		while (!queue.isEmpty()) {
-			State current = queue.poll();
-			far = current;
-			// System.out.println(current);
-			if (current.isFull())
-				return current;
-			if (current.isUnseen())
-				return current;
-			else if (!current.isPartial()) {
-				ArrayList<State> neighbors = current.findNeighbors();
-				for (State s : neighbors)
-					if (!seen.contains(s.encoded())) {
-						if (!s.isPartial())
-							queue.add(s);
-						seen.add(s.encoded());
-					}
+		if(!endGame)
+			while (!queue.isEmpty()) {
+				State current = queue.poll();
+				far = current;
+				// System.out.println(current);
+				if (current.isFull())
+					return current;
+				if (current.isUnseen())
+					return current;
+				else if (!current.isPartial()) {
+					ArrayList<State> neighbors = current.findNeighbors();
+					for (State s : neighbors)
+						if (!seen.contains(s.encoded())) {
+							if (!s.isPartial())
+								queue.add(s);
+							seen.add(s.encoded());
+						}
+				}
 			}
-		}
 		return far;
 	}
 
 	class CompareStates implements Comparator<State> {
 		public int compare(State s1, State s2) {
 			return s1.dist() - s2.dist();
+		}
+	}
+	
+	class CompareStates2 implements Comparator<State> {
+		public int compare(State s1, State s2) {
+			return s1.goaldist() - s2.goaldist();
 		}
 	}
 }

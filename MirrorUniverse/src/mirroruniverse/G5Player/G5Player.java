@@ -36,8 +36,10 @@ public class G5Player implements Player {
 			System.out.println("here");
 			if(full && !moves.isEmpty())
 				return moves.remove(0);
-			if(leftMap.goalSeen && rightMap.goalSeen)
+			if(seenCount != 0 && !leftMap.isStillExplorable() && !rightMap.isStillExplorable() || leftMap.goalSeen && rightMap.goalSeen && seenCount++ == 0)
 				full = true;
+			else
+				full = false;
 			Search s = new Search(leftMap, rightMap, full);
 			end = s.getEndState();
 
