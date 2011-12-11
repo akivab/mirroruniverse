@@ -13,9 +13,10 @@ public class Search {
 	Set<String> seen;
 	boolean fullSearch;
 	Map m1, m2;
-
+	State start;
+	
 	public Search(Map m1, Map m2, boolean full) {
-		State start = new State(m1, m2);
+		start = new State(m1, m2);
 		this.fullSearch = full;
 		Comparator<State> s = new CompareStates();
 		Comparator<State> s2 = new CompareStates2();
@@ -75,18 +76,21 @@ public class Search {
 				if(seen.size() % 1000 == 0 )
 					DEBUG.println(seen.size());
 				State current = queue.poll();
-				far = current;
 				// System.out.println(current);
 				if (current.isFull())
 					return current;
 				if (current.isUnseen())
 					return current;
-				else if (!current.isPartial()) {
+				else {
 					ArrayList<State> neighbors = current.findNeighbors();
 					for (State s : neighbors)
 						if (!seen.contains(s.encoded())) {
-							if (!s.isPartial())
+							if(s.isFull())
+								return s;
+							if (!s.isPartial() || start.isPartial())
 								queue.add(s);
+							else
+								far = s;
 							seen.add(s.encoded());
 						}
 				}

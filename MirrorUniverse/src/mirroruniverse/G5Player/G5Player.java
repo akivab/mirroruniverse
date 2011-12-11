@@ -60,8 +60,6 @@ public class G5Player implements Player {
 
 		if (moves != null && !moves.isEmpty())
 			return moves.remove(0);
-		pause();
-		DEBUG.println("There was a problem");
 		return (int) (Math.random() * 8 + 1);
 	}
 
