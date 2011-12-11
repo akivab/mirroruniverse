@@ -80,7 +80,7 @@ public class State {
 	public int goaldist() {
 		int i = m1.goalVal[p1[0]][p1[1]];
 		int j = m2.goalVal[p2[0]][p2[1]];
-		return i + j + (i-j) * (i-j) * 10;
+		return i*i + j*j + (i-j) * (i-j);
 	}
 	public ArrayList<State> findNeighbors() {
 		ArrayList<State> states = new ArrayList<State>();

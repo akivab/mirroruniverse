@@ -6,7 +6,7 @@ import java.util.Scanner;
 import mirroruniverse.sim.Player;
 
 public class G5Player implements Player {
-	public static boolean ON = false;
+	public static boolean ON = true;
 	Map leftMap, rightMap;
 	State end;
 	int seenCount = 0;
