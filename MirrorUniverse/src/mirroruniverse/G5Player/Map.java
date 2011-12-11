@@ -39,7 +39,7 @@ public class Map {
 	}
 
 	public String toString(){
-		return arr2str(grid, pos);
+		return ""; //arr2str(grid, pos);
 	}
 	public String arr2str(int[][] grid, int[] pos) {
 		String toReturn = "";

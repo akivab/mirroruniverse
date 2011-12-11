@@ -35,7 +35,7 @@ public class G5Player implements Player {
 	 */
 	public int getMove() {
 		if ((end == null || moves.isEmpty())) {
-			DEBUG.println("here");
+//			DEBUG.println("here");
 			if (full && !moves.isEmpty())
 				return moves.remove(0);
 			if (seenCount != 0 && !leftMap.isStillExplorable()
@@ -50,13 +50,13 @@ public class G5Player implements Player {
 
 			if (end != null)
 				moves = end.getDirections();
-			DEBUG.println(end);
-			DEBUG.println(moves);
-			DEBUG.println(leftMap.arr2str(leftMap.goalVal, leftMap.pos));
+//			DEBUG.println(end);
+//			DEBUG.println(moves);
+//			DEBUG.println(leftMap.arr2str(leftMap.goalVal, leftMap.pos));
 		}
-		DEBUG.println(State.encode(leftMap.pos, rightMap.pos));
-		DEBUG.println(end);
-		DEBUG.println(moves);
+//		DEBUG.println(State.encode(leftMap.pos, rightMap.pos));
+//		DEBUG.println(end);
+//		DEBUG.println(moves);
 
 		if (moves != null && !moves.isEmpty())
 			return moves.remove(0);
@@ -70,14 +70,14 @@ public class G5Player implements Player {
 	 */
 	public int lookAndMove(int[][] aintViewL, int[][] aintViewR) {
 		updateMaps(aintViewL, aintViewR);
-		DEBUG.println("maps are updated. moving.");
+	//	DEBUG.println("maps are updated. moving.");
 		int move = getMove();
 		seen.add(State.encode(leftMap.pos, rightMap.pos));
 		leftMap.setNext(move);
 		rightMap.setNext(move);
 		// pause();
-		DEBUG.println(leftMap, DEBUG.MEDIUM);
-		DEBUG.println(rightMap, DEBUG.MEDIUM);
+	//	DEBUG.println(leftMap, DEBUG.MEDIUM);
+	//	DEBUG.println(rightMap, DEBUG.MEDIUM);
 		return move;
 	}
 }
