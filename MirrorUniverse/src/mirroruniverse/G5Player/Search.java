@@ -1,6 +1,5 @@
 package mirroruniverse.G5Player;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -9,7 +8,6 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Timer;
 
 public class Search {
 	Queue<State> queue, partial, queue2;
@@ -24,7 +22,7 @@ public class Search {
 		Comparator<State> s = new CompareStates();
 		Comparator<State> s2 = new CompareStates2();
 		queue = new PriorityQueue<State>(10, s);
-		partial = new PriorityQueue<State>(10, s2);
+		partial = new LinkedList<State>();
 		queue2 = new PriorityQueue<State>(10, s2);
 		seen = new HashSet<String>();
 		queue.add(start);
@@ -45,8 +43,6 @@ public class Search {
 				if(seen.size() % 1000 == 0 )
 					DEBUG.println(seen.size());
 				State current = queue2.poll();
-				if(bestSoFar==null || bestSoFar.goaldist() > current.goaldist())
-					bestSoFar = current;
 				far = current;
 				ArrayList<State> neighbors = current.findNeighbors();
 				for (State s : neighbors) {
@@ -62,7 +58,7 @@ public class Search {
 				}
 			}
 			if(endGame)
-				while (!partial.isEmpty() && Calendar.getInstance().getTimeInMillis() - time < 70000) {
+				while (!partial.isEmpty() && Calendar.getInstance().getTimeInMillis() - time < 120000) {
 					State current = partial.poll();
 					System.out.println(current);
 					if(seen.size() % 100 == 0)
@@ -80,7 +76,7 @@ public class Search {
 		DEBUG.println("done with endgame search");
 		seen = new HashSet<String>();
 		if(!endGame)
-			while (!queue.isEmpty() && Calendar.getInstance().getTimeInMillis() - time < 60000) {
+			while (!queue.isEmpty() && Calendar.getInstance().getTimeInMillis() - time < 90000) {
 				if(seen.size() % 1000 == 0 )
 					DEBUG.println(seen.size());
 				State current = queue.poll();
@@ -103,8 +99,6 @@ public class Search {
 						}
 				}
 			}
-		if(bestSoFar != null)
-			return bestSoFar;
 		return far;
 	}
 
